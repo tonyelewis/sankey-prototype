@@ -1,0 +1,39 @@
+{
+	"versions" : [ "v3_5_0", "v4_0_0", "new" ],
+	"nodes" : [
+		{"id": "v3_5_0/24",       "version": "v3_5_0", "name": "24",          "size": 20 },
+		{"id": "v3_5_0/36",       "version": "v3_5_0", "name": "36",          "size":  9 },
+		{"id": "v3_5_0/102",      "version": "v3_5_0", "name": "102",         "size":  2 },
+		{"id": "v3_5_0/115",      "version": "v3_5_0", "name": "115",         "size": 64 },
+
+		{"id": "v4_0_0/11",       "version": "v4_0_0", "name": "11",          "size": 20 },
+		{"id": "v4_0_0/12",       "version": "v4_0_0", "name": "12",          "size": 33 },
+		{"id": "v4_0_0/62",       "version": "v4_0_0", "name": "62",          "size": 15 },
+		{"id": "v4_0_0/63",       "version": "v4_0_0", "name": "63",          "size": 22 },
+		{"id": "v4_0_0/133",      "version": "v4_0_0", "name": "133",         "size":  2 },
+		{"id": "v4_0_0/156",      "version": "v4_0_0", "name": "156",         "size": 52 },
+
+		{"id": "new/working_99",  "version": "new",    "name": "working_99",  "size": 25 },
+		{"id": "new/working_100", "version": "new",    "name": "working_100", "size": 23 },
+		{"id": "new/working_230", "version": "new",    "name": "working_230", "size":  2 },
+		{"id": "new/working_239", "version": "new",    "name": "working_239", "size": 64 },
+		{"id": "new/working_240", "version": "new",    "name": "working_240", "size": 37 },
+		{"id": "new/working_241", "version": "new",    "name": "working_241", "size": 33 }
+	],
+	"links" : [
+		{"source": "v3_5_0/24",  "target": "v4_0_0/12",       "value":  15, "mapped": false },
+		{"source": "v3_5_0/36",  "target": "v4_0_0/62",       "value":   7, "mapped": true  },
+		{"source": "v3_5_0/102", "target": "v4_0_0/133",      "value":   2, "mapped": true  },
+		{"source": "v3_5_0/115", "target": "v4_0_0/11",       "value":  14, "mapped": false },
+		{"source": "v3_5_0/115", "target": "v4_0_0/63",       "value":  14, "mapped": false },
+		{"source": "v3_5_0/115", "target": "v4_0_0/156",      "value":  30, "mapped": false },
+
+		{"source": "v4_0_0/11",  "target": "new/working_239", "value":  18, "mapped": true  },
+		{"source": "v4_0_0/12",  "target": "new/working_241", "value":  17, "mapped": false },
+		{"source": "v4_0_0/62",  "target": "new/working_99",  "value":  14, "mapped": true  },
+		{"source": "v4_0_0/63",  "target": "new/working_100", "value":  16, "mapped": false },
+		{"source": "v4_0_0/133", "target": "new/working_230", "value":   2, "mapped": true  },
+		{"source": "v4_0_0/156", "target": "new/working_239", "value":   2, "mapped": false },
+		{"source": "v4_0_0/156", "target": "new/working_240", "value":  28, "mapped": false }
+	]
+}

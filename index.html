@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<div style="width: 60%; margin:0 auto;">
+
+<div class="cmc-main-text">
+<h3>[<strong>PROTOTYPE</strong>] A Map of 3.30.910.10's FunFams Across CATH Releases</h3>
+
+<ul>
+  <li>The height of each pill represents the number of domains.</li>
+  <li>The height of each link represents the number of shared domains (tolerating some changes in domain definitions).</li>
+  <li>The colours are just to help highlight relationships.</li>
+	<li>v3.5 / v4.0 use real data; v4.8 uses some CAFA data.</li>
+</ul>
+
+</div>
+
+<div align="center">
+<svg width="675" height="675"></svg>
+</div>
+</div>
+<script src="d3.v4.min.js"></script>
+<script src="sankey.js"></script>
+<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+<!-- <script src="https://unpkg.com/d3-sankey@0.7.1"></script> -->
+
+<style>
+
+.cmc-main-text {
+	font-family : "Open Sans",arial,sans-serif;
+	font-size   : 95%;
+	font-style  : normal;
+}
+
+text {
+	font-family : "Open Sans",arial,sans-serif;
+	font-size   : 125%;
+	font-weight : bold;
+}
+
+rect {
+	rx: 4px;
+	ry: 4px;
+}
+
+</style>
+
+<script>
+
+function shadeColor2(color, percent) {   
+    var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+    return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+}
+
+var color        = d3.scaleOrdinal( d3.schemeCategory10 );
+var formatNumber = d3.format      ( ",.0f"              );
+var svg          = d3.select      ( "svg"               );
+var width        = +svg.attr      ( "width"             );
+var height       = +svg.attr      ( "height"            );
+var format       = function(d) { return formatNumber(d) + " entries"; };
+
+var sankey = d3.sankey()
+	.nodeId     ( function(d) { return d.id }               )
+	.nodeWidth  ( 10                                        )
+	.nodePadding( 10                                        )
+	.extent     ( [ [ 35, 35 ], [ width - 70, height - 37 ] ] );
+
+var the_shadow_filter = svg
+	.append( "defs"                          )
+	.append( "filter"                        )
+	.attr  ( "id",     "dropshadow"          )
+	.attr  ( "width",  "200%"                )
+	.attr  ( "height", "130%"                );
+the_shadow_filter
+	.append( "feGaussianBlur"                )
+	.attr  ( "in",           "SourceAlpha"   )
+	.attr  ( "stdDeviation", "2"             );
+the_shadow_filter
+	.append( "feOffset"                      )
+	.attr  ( "dx", "1"                       )
+	.attr  ( "dy", "1"                       )
+	.attr  ( "result", "offsetblur"          );
+the_shadow_filter
+	.append( "feComponentTransfer"           )
+	.append( "feFuncA"                       )
+	.attr  ( "type", "linear"                )
+	.attr  ( "slope", "0.3"                  );
+var the_merge_node = the_shadow_filter
+	.append( "feMerge"                       );
+the_merge_node
+	.append( "feMergeNode"                   );
+the_merge_node
+	.append( "feMergeNode"                   )
+	.attr  ( "in", "SourceGraphic"           );
+
+var link = svg
+	.append   ( "g"                          )
+	.attr     ( "class",          "links"    )
+	.attr     ( "fill",           "none"     )
+	.attr     ( "stroke",         "#8c8c8c"  )
+	.attr     ( "stroke-opacity", 0.25       )
+	.selectAll( "path"                       );
+
+var node = svg
+	.append   ( "g"                          )
+	.attr     ( "class",       "nodes"       )
+	.attr     ( "font-family", "sans-serif"  )
+	.attr     ( "font-size",    10           )
+	.selectAll( "g"                          );
+
+d3.json( "ian.3.json", function(error, map_data) {
+	if (error) throw error;
+
+	var gradient = svg
+		.append( "defs"                            )
+		.append( "linearGradient"                  )
+		.attr  ( "id", "tony-gradient"             )
+		.attr  ( "x1", "25%"                       )
+		.attr  ( "x2", "75%"                       )
+		.attr  ( "y1", "50%"                       )
+		.attr  ( "y2", "50%"                       );
+
+	gradient
+		.append( "stop"                     )
+		.attr  ( "class",      "stop-left"  )
+		.attr  ( "offset",     "0%"         )
+		.attr  ( "stop-color", "#4cff4c"    );
+
+	gradient
+		.append( "stop"                     )
+		.attr  ( "class",      "stop-right" )
+		.attr  ( "offset",     "100%"       )
+		.attr  ( "stop-color", "#ff6342"    );
+
+
+	sankey( map_data );
+
+	map_data.links.forEach( function(link) {
+		var source_colour = link.source.colour;
+		var target_colour = link.target.colour;
+		if ( source_colour != target_colour ) {
+			var source_colstr = source_colour.substring( 1 );
+			var target_colstr = target_colour.substring( 1 );
+			var gradient_magic = svg
+				.append( "defs"                                                       )
+				.append( "linearGradient"                                             )
+				.attr  ( "id", "tony-gradient-" + source_colstr + "-" + target_colstr )
+				.attr  ( "x1", "25%"                                                  )
+				.attr  ( "x2", "75%"                                                  )
+				.attr  ( "y1", "50%"                                                  )
+				.attr  ( "y2", "50%"                                                  );
+
+			gradient_magic
+				.append( "stop"                      )
+				.attr  ( "class",      "stop-left"   )
+				.attr  ( "offset",     "0%"          )
+				.attr  ( "stop-color", source_colour );
+
+			gradient_magic
+				.append( "stop"                      )
+				.attr  ( "class",      "stop-right"  )
+				.attr  ( "offset",     "100%"        )
+				.attr  ( "stop-color", target_colour );
+		}
+		else {
+			console.log( source_colour, target_colour )
+		}
+	} );
+
+	// Ensure none of the links are completely horizontal,
+	// because that breaks the rendering of the gradient
+	map_data.links.forEach( function(link) {
+		if ( Math.abs( link.y0 - link.y1 ) < 0.1 ) {
+			link.y1 += 0.1;
+		}
+	} );
+
+	// Get a map from version the version's column's x0 and x1
+	var cols_of_version = new Map();
+	map_data.nodes.forEach( function(node) {
+		cols_of_version.set( node.version, [ node.x0, node.x1 ] );
+	} );
+
+	// Add column headers
+	cols_of_version.forEach(function(x0_x1, version) {
+		svg
+			.append( "text" )
+			.attr   ( "x",           function(d) { return ( x0_x1[ 0 ] + x0_x1[ 1 ] ) / 2; } )
+			.attr   ( "y",           0                                                       )
+			.attr   ( "dy",          "1em"                                                   )
+			.attr   ( "text-anchor", "middle"                                                )
+			.text   ( version                                                                );
+	});
+
+	link = link
+		.data   ( map_data.links                                     )
+		.enter  (                                                    )
+		.append ( "path"                                             )
+		.classed( "cmc-equiv-mapped-link", function(d) {
+			return d.mapped;
+		} )
+		.attr   ( "d",                     d3.sankeyLinkHorizontal() )
+		.attr   ( "stroke-width",          function(d) {
+			return Math.max(1, d.width);
+		} );
+
+	link.append( "title" )
+		.text(function(d) {
+			return d.source.name
+			+ " ["
+			+ d.source.version
+			+ "] → "
+			+ d.target.name
+			+ " ["
+			+ d.target.version
+			+ "]\n"
+			+ format(d.value)
+			+ " mapped";
+		} );
+
+	link
+		.filter ( function(link) { return ( link.source.colour != link.target.colour ); } )
+		.attr   ( "style", function(link) {
+			return "stroke: url(#tony-gradient-"
+				+ link.source.colour.substring( 1 )
+				+ "-"
+				+ link.target.colour.substring( 1 )
+				+ ")";
+		} );
+
+		2250 / 2000
+
+	link
+		.filter ( function(link) { return ( link.source.colour == link.target.colour ); } )
+		.attr   ( "stroke", function(link) { return link.source.colour; } );
+
+	node = node
+		.data  ( map_data.nodes )
+		.enter (                )
+		.append( "g"            );
+
+
+	node.append( "rect" )
+		.attr( "style", "filter: url(#dropshadow);" )
+		.attr( "x",      function(d) { return        d.x0;                          } )
+		.attr( "width",  function(d) { return d.x1 - d.x0;                          } )
+		.attr( "y",      function(d) { return        d.y0 - 2;                      } )
+		.attr( "height", function(d) { return d.y1 - d.y0 + 4;                      } )
+		.attr( "fill",   function(d) { return d.colour;                              } )
+		.attr( "stroke", function(d) {
+			return shadeColor2( d.colour, -0.6 );
+		});
+
+	node.append( "text" )
+		.attr   ( "x",           function(d) { return d.x0 - 6; }            )
+		.attr   ( "y",           function(d) { return ( d.y1 + d.y0 ) / 2; } )
+		.attr   ( "dy",          "0.35em"                                    )
+		.attr   ( "text-anchor", "end"                                       )
+		.text   ( function(d) { return d.name;           }                   )
+		.filter ( function(d) { return d.x0 < width / 2; }                   )
+		.attr   ( "x",           function(d) { return d.x1 + 6; }            )
+		.attr   ( "text-anchor", "start"                                     );
+
+	node.append( "title" )
+		.text( function(d) {
+			return "ID : "        + d.name
+			     + "\nVersion : " + d.version
+			     + "\n"           + format( d.value );
+		} );
+});
+
+</script>
